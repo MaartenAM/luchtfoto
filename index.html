@@ -25,6 +25,12 @@
       width: 100%;
       height: 100%;
     }
+    /* Zorg dat de slider altijd zichtbaar is */
+    .leaflet-sbs-divider {
+      background: #fff;
+      width: 4px;
+      opacity: 0.8;
+    }
   </style>
 </head>
 <body>
@@ -36,19 +42,26 @@
   <script src="https://cdn.jsdelivr.net/npm/leaflet-side-by-side@2.0.1/leaflet-side-by-side.min.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-      // Basiskaart initialiseren
-      const map = L.map('map').setView([52.2, 5.4], 8);
+      // Initialiseer de kaart en zoom dichter in voor hoge-res detail
+      const map = L.map('map').setView([52.2, 5.4], 12);
+
+      // OpenStreetMap-achtergrond voor context
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution:
+          '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+        maxZoom: 19
+      }).addTo(map);
 
       // PDOK WMTS parameters
       const baseUrl = 'https://service.pdok.nl/hwh/luchtfotorgb/wmts/v1_0';
       const commonParams =
-        '?service=WMTS&request=GetTile&version=1.0.0&style=default&tileMatrixSet=EPSG:3857&format=image/jpeg';
+        '?service=WMTS&request=GetTile&version=1.0.0&style=default&tilematrixset=EPSG:3857&format=image/jpeg';
 
       // Luchtfoto 2024 (HR 8cm)
       const layer2024 = L.tileLayer(
         `${baseUrl}${commonParams}` +
           '&layer=Luchtfoto%202024%20Ortho%208cm%20RGB' +
-          '&tileMatrix={z}&tileRow={y}&tileCol={x}',
+          '&tilematrix={z}&tilerow={y}&tilecol={x}',
         {
           attribution:
             '&copy; <a href="https://www.pdok.nl/">PDOK</a> (CC BY 4.0)',
@@ -56,11 +69,11 @@
         }
       );
 
-      // Luchtfoto 2025 (HR 8cm) – zodra beschikbaar
+      // Luchtfoto 2025 (HR 8cm) – nog niet beschikbaar in PDOK
       const layer2025 = L.tileLayer(
         `${baseUrl}${commonParams}` +
           '&layer=Luchtfoto%202025%20Ortho%208cm%20RGB' +
-          '&tileMatrix={z}&tileRow={y}&tileCol={x}',
+          '&tilematrix={z}&tilerow={y}&tilecol={x}',
         {
           attribution:
             '&copy; <a href="https://www.pdok.nl/">PDOK</a> (CC BY 4.0)',
@@ -68,11 +81,10 @@
         }
       );
 
-      // Voeg lagen toe aan de kaart
+      // Voeg de lagen toe en maak de side-by-side slider
       layer2024.addTo(map);
       layer2025.addTo(map);
 
-      // Side by side slider
       L.control
         .sideBySide(layer2024, layer2025, {
           thumbSize: 42,
