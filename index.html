@@ -318,9 +318,9 @@
         const layer2024 = '2024_orthoHR';
         const layer2025 = '2025_quickorthoHR';
 
-        // WMTS URL template
+        // WMTS URL template - correcte PDOK structuur
         function getWMTSUrl(layerName) {
-            return `${wmtsUrl}/wmts?REQUEST=GetTile&SERVICE=WMTS&VERSION=1.0.0&LAYER=${layerName}&STYLE=default&FORMAT=image/jpeg&TILEMATRIXSET=EPSG:3857&TILEMATRIX=EPSG:3857:{z}&TILEROW={y}&TILECOL={x}`;
+            return `${wmtsUrl}/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=${layerName}&STYLE=default&FORMAT=image/jpeg&TILEMATRIXSET=EPSG:3857&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}`;
         }
 
         // Initialiseer de kaart
@@ -338,6 +338,13 @@
                 position: 'topright'
             }).addTo(map);
 
+            // Voeg een fallback OpenStreetMap laag toe
+            const osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors',
+                opacity: 0.3
+            });
+            osmLayer.addTo(map);
+
             // Laad initiële 2024 laag
             loadLayer2024();
 
@@ -345,7 +352,7 @@
             setTimeout(() => {
                 document.getElementById('loading').style.display = 'none';
                 isLoading = false;
-            }, 2000);
+            }, 3000);
         }
 
         function loadLayer2024() {
@@ -356,11 +363,23 @@
             currentLayer2024 = L.tileLayer(getWMTSUrl(layer2024), {
                 attribution: '© PDOK | Luchtfoto 2024',
                 maxZoom: 19,
-                className: 'fade-transition'
+                minZoom: 6,
+                className: 'fade-transition',
+                errorTileUrl: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==',
+                crossOrigin: true
             });
 
             currentLayer2024.addTo(map);
             updateLayerIndicator('2024_orthoHR');
+            
+            // Debug logging
+            currentLayer2024.on('tileload', function() {
+                console.log('2024 tile loaded successfully');
+            });
+            
+            currentLayer2024.on('tileerror', function(e) {
+                console.log('2024 tile error:', e);
+            });
         }
 
         function loadLayer2025() {
@@ -371,11 +390,23 @@
             currentLayer2025 = L.tileLayer(getWMTSUrl(layer2025), {
                 attribution: '© PDOK | Luchtfoto 2025',
                 maxZoom: 19,
-                className: 'fade-transition'
+                minZoom: 6,
+                className: 'fade-transition',
+                errorTileUrl: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==',
+                crossOrigin: true
             });
 
             currentLayer2025.addTo(map);
             updateLayerIndicator('2025_quickorthoHR');
+            
+            // Debug logging
+            currentLayer2025.on('tileload', function() {
+                console.log('2025 tile loaded successfully');
+            });
+            
+            currentLayer2025.on('tileerror', function(e) {
+                console.log('2025 tile error:', e);
+            });
         }
 
         function updateLayerIndicator(layerName) {
