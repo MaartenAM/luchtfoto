@@ -55,12 +55,12 @@
       // PDOK WMTS parameters
       const baseUrl = 'https://service.pdok.nl/hwh/luchtfotorgb/wmts/v1_0';
       const commonParams =
-        '?service=WMTS&request=GetTile&version=1.0.0&style=default&tilematrixset=EPSG:3857&format=image/jpeg';
+        '?service=WMTS&request=GetTile&version=1.0.0&style=default&tileMatrixSet=EPSG:3857&format=image/jpeg';
 
-      // Luchtfoto 2024 (HR 8cm)
+      // Luchtfoto 2024 (HR)
       const layer2024 = L.tileLayer(
         `${baseUrl}${commonParams}` +
-          '&layer=Luchtfoto%202024%20Ortho%208cm%20RGB' +
+          '&layer=2024_orthoHR' +
           '&tilematrix={z}&tilerow={y}&tilecol={x}',
         {
           attribution:
@@ -69,10 +69,10 @@
         }
       );
 
-      // Luchtfoto 2025 (HR 8cm) – nog niet beschikbaar in PDOK
+      // Luchtfoto 2025 (Quickortho HR)
       const layer2025 = L.tileLayer(
         `${baseUrl}${commonParams}` +
-          '&layer=Luchtfoto%202025%20Ortho%208cm%20RGB' +
+          '&layer=2025_quickorthoHR' +
           '&tilematrix={z}&tilerow={y}&tilecol={x}',
         {
           attribution:
